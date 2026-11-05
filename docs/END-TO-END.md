@@ -1,14 +1,14 @@
 # What works end to end, what doesn't yet, and how to fix each gap
 
-## Works today (verified by 41 tests and the recorded demo)
+## Works today (verified by 46 tests)
 
 | Path | Status |
 |---|---|
-| Engine math, ranking, payer mix, flags | ✅ unit-tested with hand-checked arithmetic |
+| Engine math, ranking, payer mix, flags, cross-payer rate audit | ✅ unit-tested with hand-checked arithmetic |
 | Agent loop: tools, final JSON, verifier, repair turn | ✅ against the mock API |
 | **The live HTTP code path** (`META_API_BASE` + Bearer key, real socket) | ✅ `test_end_to_end_over_network`: the CLI in live mode against the mock served on a port |
 | Budget guard, monthly cap, usage log | ✅ tested |
-| HTTP API and web UI (desktop and mobile) | ✅ tested, with screenshots and video in `demo/` |
+| HTTP API and web UI (desktop and mobile) | ✅ tested |
 | MCP server over stdio (tools and skill resources) | ✅ tested with a real MCP client |
 | Importers for FDA NDC JSON, NADAC CSV and wholesaler CSV | ✅ against fixtures in the published schemas |
 
@@ -21,11 +21,9 @@ key. **Fix:**
 1. At dev.meta.ai: turn on 2FA, add a payment method (required even for
    credits; expect a temporary pre-authorization charge), and set a monthly
    spend notification on the Billing page.
-2. Claim the $150 hackathon credits through the form in the participant guide
-   **before Nov 4, 9 PM ET**.
-3. Create a key, then `cp .env.example .env`, fill in `META_API_KEY`, and
-   `set -a; . ./.env; set +a`.
-4. Run `ndc-scout check-api`. It walks through four checks: list models,
+2. Create a key, then `cp .env.example .env`, fill in `META_API_KEY` (it
+   loads automatically via `python-dotenv`).
+3. Run `ndc-scout check-api`. It walks through four checks: list models,
    plain chat, tool calling, and cost. Each failure prints the specific fix.
 
 ### 2. Two API details are inferred, not confirmed from Meta's own docs
@@ -62,7 +60,7 @@ If live runs still come back `unverified`:
 - Raise `repair_turns`.
 
 Run 10–20 live queries and track how often the status is `verified`. That
-number is a strong "Technical depth" point for judges.
+number is the real measure of how reliable live mode actually is.
 
 ### 4. The data is synthetic (the biggest real-world gap)
 
@@ -79,11 +77,11 @@ public:
 
 Then run `NDC_SCOUT_DATA_DIR=real_data ndc-scout serve`.
 
-What's realistic for the hackathon:
+What's realistic right now:
 - Real FDA and NADAC data, plus Medicaid (`nadac_plus_fee`) with your state's
   published fee, is fully public. That is legitimate real data.
 - Acquisition cost, AWP and MAC stay synthetic unless a pharmacy shares them
-  *with permission*. The rules ban data you don't have rights to.
+  *with permission*. Only use data you actually have rights to share.
 - Label anything synthetic, which the UI already does.
 - With only public data, you can't use NADAC as your acquisition cost: the
   Medicaid margin would just equal the dispensing fee for every NDC. You need
@@ -94,24 +92,25 @@ importers were tested on hand-made fixtures in the documented formats. Run them
 once on the real downloads. If a column name differs, the error points at
 `importers.py`.
 
-### 5. Muse Code skills and MCP support are unconfirmed
+### 5. Other coding agents' skills/MCP support is unconfirmed
 
-Nothing in the reference repos shows whether Muse Code reads `SKILL.md`
-folders or MCP servers. I ship three things:
+Nothing confirms whether every coding agent reads `SKILL.md` folders or MCP
+servers the same way. This repo ships three things so it works with whichever
+one you're using:
 - `AGENTS.md`, a convention many coding agents read
 - `skills/`, plain markdown that's useful to any agent and is also the runtime
   prompt
 - `.mcp.json`, the standard MCP server config
 
-To check, ask Muse Code to list its tools with this repo open, or look at
-`muse --help` for `mcp` or `skills`. If it supports MCP, register
+To check, ask your agent to list its tools with this repo open, or look for
+`mcp` or `skills` support in its docs. If it supports MCP, register
 `python -m ndc_scout.mcp_server`. If it doesn't, the HTTP API works with any
 client.
 
-### 6. "Live product" hosting for judges
+### 6. Hosting it as a live product
 
-The rubric gives 25% to the demo, which judges score by whether it holds up
-live. To host it:
+If you want people to interact with it live rather than just watch a
+recording:
 1. Deploy the FastAPI app on any Python host: `pip install .` and
    `ndc-scout serve --host 0.0.0.0 --port $PORT`.
 2. Set `META_API_KEY` as a server secret. It's only read server-side and never
@@ -122,24 +121,16 @@ live. To host it:
 4. Without a key, `/api/ask` defaults to mock mode, so a public demo never
    breaks. It does label itself MOCK.
 
-### 7. Optional: the $10K open-weights bonus
+### 7. Optional: an open-weights model path
 
-Because the client is OpenAI-compatible, point `META_API_BASE` at Baseten's
-OpenAI-compatible endpoint (see their quickstart in the participant guide) and
-set `META_MODEL=meta-models/muse-spark-open-1026`. Add a pricing row in
+Because the client is OpenAI-compatible, point `META_API_BASE` at an
+OpenAI-compatible open-weights endpoint (e.g. Baseten) and set
+`META_MODEL=meta-models/muse-spark-open-1026`. Add a pricing row in
 `llm.PRICING`, since unknown models are priced at the most expensive rate.
 Run `check-api` first; tool-calling support on that deployment is unverified.
 
-### 8. Rules to handle yourself
+### 8. Repo hygiene before going public
 
-- **New work only.** The building period is Oct 27 – Nov 4. Commit from day 1
-  so the history shows it, and in the README and video say what was built
-  during the event.
-- **"Use of Meta AI tooling" is 25%.** This code was written with Claude, not
-  Muse Code. Check the official rules on AI-assisted code, and consider doing
-  real development in Muse Code (and saying so). Use Meta's models beyond one
-  tool loop, for example Muse Spark reading a photographed wholesaler invoice
-  or price sheet through vision to build `catalog.csv`, or the open-weights
-  route.
-- **The public repo must not contain `.env`.** Run `git log -p | grep -i meta_api`
-  before making it public.
+The public repo must not contain `.env`. Run `git log -p | grep -i meta_api`
+across your commit history before making it public — the working tree can be
+clean while an old commit still has a key in it.

@@ -99,9 +99,8 @@ ndc-scout check-api && ndc-scout ask --drug lisinopril --payer medicaid-nadac --
 
 ## Docs
 
-- [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md): architecture, plus how the
-  reference projects (meta-costcenter, meta-keyguard, field notes, CrossBeam)
-  work.
+- [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md): architecture, file by file,
+  and what one agent run does step by step.
 - [docs/END-TO-END.md](docs/END-TO-END.md): what's verified, what needs your
   key or data, and how to fix each gap.
 - [DEMO.md](DEMO.md): demo paths, the video script and the judging checklist.

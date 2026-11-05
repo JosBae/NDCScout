@@ -14,5 +14,5 @@ Repo: NDC Scout, a pharmacy NDC reimbursement ranker built on Meta Model API.
 - Use `ndc-scout ask --mock` for development. Live calls cost money; see
   `skills/meta-spend-safety/SKILL.md`. Never print or commit `META_API_KEY`.
 - `sample_data/` is synthetic. Don't present its numbers as real prices.
-- Never add clinical or medical advice. The hackathon bans it, and this tool only
-  makes purchasing decisions between equivalent packages.
+- Never add clinical or medical advice. This tool only makes purchasing
+  decisions between equivalent packages.

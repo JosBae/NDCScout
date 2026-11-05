@@ -50,14 +50,3 @@ ndc-scout serve         # the UI defaults to "Meta (live)" when a key is set
 | 1:45–2:10 | Compare AWP vs MAC, dumbbell chart | "Different payers calculate reimbursement completely differently. Same drug, MAC-based payer versus AWP-based payer — and the best NDC actually flips. A real, non-obvious call she can act on before she buys." |
 | 2:10–2:40 | Rate Audit page, run audit, show the flagged row | "And remember that problem — one PBM quietly paying less than another for the same drug? This is the receipt. One click cross-checks a payer's MAC against every peer payer and the public NADAC rate. Right here: fifty-one percent of what a peer pays for the identical drug — found in seconds, not buried in a spreadsheet." |
 | 2:40–3:00 | Back to home page | "Meta's model does the talking. Deterministic math does the deciding. And Maria gets her evening back. NDC Scout." |
-
-## Judging checklist (official rubric)
-
-- [ ] Impact (30%): a named user (independent pharmacy buyer) and the dollar spread per fill
-- [ ] Meta tooling (25%): a live Muse Spark run on screen, with tool calls, the verifier and repair; say exactly what you used
-- [ ] Demo (25%): the video is the main artifact, and the hosted product works
-- [ ] Technical depth (20%): 46 tests, the verifier, fail-closed flags, the cross-payer rate audit
-- [ ] Public repo; `.env` never committed
-- [ ] New work only, clearly stated (README section)
-- [ ] Synthetic data labeled everywhere it appears
-- [ ] Submitted on the Cerebral Valley platform by **Nov 4, 9:00 PM ET**; credits claimed by the same time
