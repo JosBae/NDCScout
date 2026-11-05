@@ -25,9 +25,8 @@ pip install -e . && ndc-scout serve        # open http://127.0.0.1:8000
    Several drugs flag `mac_below_peer_payers` — this payer's MAC is as low as
    51% of what another sample payer pays for the identical drug.
 
-Recorded output (screenshots, a walkthrough video, a CLI transcript) will be
-added to `demo/` once re-recorded against steps 6–7 above; the folder is
-empty for now rather than shipping assets that predate the current app.
+`demo/walkthrough.mp4` is silent raw screen capture of steps 1–7 above (no
+narration baked in); add your own voiceover, or screenshots, separately.
 
 ## Path B: live with Meta Model API
 
@@ -46,7 +45,7 @@ ndc-scout serve         # the UI defaults to "Meta (live)" when a key is set
 | 0:12–0:35 | Still no app | "PBMs set a 'maximum allowable cost' for every generic — but they don't have to explain how, and it can change without warning. Three companies process eighty percent of the prescription claims in this country. If Maria pushes back on a bad rate, she doesn't get a better deal — she risks losing a huge slice of her patients overnight." |
 | 0:35–0:55 | Still no app | "And it's not even consistent. One PBM can pay fifty percent less than another for the identical drug. There's no way to catch that by hand, across hundreds of drugs and every payer in her book. That's the problem NDC Scout solves." |
 | 0:55–1:10 | Ranking page, "atorvastatin 40 mg", Medicaid NADAC, click "Rank only" | "It ranks every NDC of a drug by real margin — reimbursement minus acquisition cost — computed by a deterministic pricing engine, not a guess." |
-| 1:10–1:45 | Switch to "Meta (live)", ask a plain-English question, let the trace expand, show verifier PASS | "Maria doesn't want to fill out a form — she wants to ask. This is Meta's model doing the work: real tool-calling against the Meta Model API, picking the right lookups, writing the answer. But it never touches the math itself — every number gets independently recomputed and verified before she ever sees it. Right here, turn by turn." |
+| 1:10–1:45 | Switch to "Meta (live)", ask a plain-English question, let the trace expand, show verifier PASS | "Maria doesn't want to fill out a form — she wants to ask. This is Meta's model doing the work: real tool-calling against the Meta Model API, picking the right lookups, writing the answer. But it never touches the math itself — every number gets independently recomputed and verified //" |
 | 1:45–2:10 | Compare AWP vs MAC, dumbbell chart | "Different payers calculate reimbursement completely differently. Same drug, MAC-based payer versus AWP-based payer — and the best NDC actually flips. A real, non-obvious call she can act on before she buys." |
 | 2:10–2:40 | Rate Audit page, run audit, show the flagged row | "And remember that problem — one PBM quietly paying less than another for the same drug? This is the receipt. One click cross-checks a payer's MAC against every peer payer and the public NADAC rate. Right here: fifty-one percent of what a peer pays for the identical drug — found in seconds, not buried in a spreadsheet." |
-| 2:40–3:00 | Back to home page | "Meta's model does the talking. Deterministic math does the deciding. And Maria gets her evening back. NDC Scout." |
+| 2:40–3:00 | Back to home page | "Meta's model identifies which calculations to use and the best times to use them, and by doing so,  Maria gets to save her time and money to better her pharmacy. This is NDC Scout." |

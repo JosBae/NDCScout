@@ -312,13 +312,19 @@ async function init() {
   $("#druglist").innerHTML = d.drugs.map(x => `<option value="${esc(x.generic_name + " " + x.strength)}">${esc(x.drug_id)}</option>`).join("");
   payers = (await api("/api/payers")).payers;
   $("#payer").innerHTML = payers.map(p => `<md-select-option value="${esc(p.id)}"><div slot="headline">${esc(p.name)}</div></md-select-option>`).join("");
-  $("#payer").value = payers[0]?.id || "";
   const macPayers = payers.filter(p => p.formula === "mac_plus_fee" || p.formula === "lesser_of_awp_discount_or_mac");
   $("#auditPayer").innerHTML = macPayers.map(p => `<md-select-option value="${esc(p.id)}"><div slot="headline">${esc(p.name)}</div></md-select-option>`).join("");
-  $("#auditPayer").value = macPayers[0]?.id || "";
+  // md-outlined-select can finish connecting its slotted options after this script runs (especially while its
+  // page starts hidden), and setting .value before that leaves the closed field's label blank even though the
+  // value itself is correct -- defer a frame so the component has settled first.
   $("#mixPayer").innerHTML = payers.map((p, i) => `<span>${esc(p.name)}</span><input type="number" min="0" step="5" data-p="${esc(p.id)}" value="${[30,40,10,20][i] ?? 0}">`).join("");
   const note = () => { const p = payers.find(x => x.id === $("#payer").value); $("#payerNote").textContent = payerMode === "one" ? (p?.notes || "") : "Weights = % of fills for this drug, by plan."; };
-  $("#payer").addEventListener("change", note); note();
+  $("#payer").addEventListener("change", note);
+  requestAnimationFrame(() => {
+    $("#payer").value = payers[0]?.id || "";
+    $("#auditPayer").value = macPayers[0]?.id || "";
+    note();
+  });
   const applyPayerMode = seg("#payerMode", v => { payerMode = v; $("#onePayer").style.display = v === "one" ? "" : "none"; $("#mixPayer").style.display = v === "mix" ? "grid" : "none"; note(); });
   const applyModelMode = seg("#modelMode", setModel);
   applyPayerMode("one");
