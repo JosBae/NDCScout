@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "synthetic": true,
+    "reference_date": "2026-10-21",
+    "warning": "SYNTHETIC SAMPLE DATA. Fictitious labelers, invented prices, illustrative payer formulas. Do not use for real purchasing."
+  },
+  "payers": [
+    {
+      "id": "medicaid-nadac",
+      "name": "State Medicaid (sample NADAC + fee model)",
+      "formula": "nadac_plus_fee",
+      "dispensing_fee": 10.5,
+      "notes": "Many state Medicaid programs pay NADAC (or WAC if no NADAC) plus a professional dispensing fee. Fee here is illustrative; look up your state's actual fee."
+    },
+    {
+      "id": "pbm-mac",
+      "name": "Commercial PBM A (sample generic MAC)",
+      "formula": "mac_plus_fee",
+      "dispensing_fee": 0.5,
+      "mac_per_unit": {
+        "atorvastatin-40mg-tab": 0.052,
+        "metformin-500mg-tab": 0.018,
+        "lisinopril-10mg-tab": 0.026,
+        "amoxicillin-500mg-cap": 0.081,
+        "sertraline-50mg-tab": 0.045,
+        "albuterol-hfa-90mcg": 2.95
+      },
+      "notes": "Pays the plan's Maximum Allowable Cost per unit regardless of NDC, so NDC choice only changes your acquisition cost."
+    },
+    {
+      "id": "pbm-awp-lesser",
+      "name": "Commercial PBM B (sample lesser of AWP-84% or MAC)",
+      "formula": "lesser_of_awp_discount_or_mac",
+      "awp_discount": 0.84,
+      "dispensing_fee": 1.0,
+      "mac_per_unit": {
+        "atorvastatin-40mg-tab": 0.19,
+        "metformin-500mg-tab": 0.045,
+        "lisinopril-10mg-tab": 0.09,
+        "amoxicillin-500mg-cap": 0.16,
+        "sertraline-50mg-tab": 0.21,
+        "albuterol-hfa-90mcg": 1.4
+      },
+      "notes": "Reimbursement depends on the specific NDC's AWP until the MAC cap binds, so high-AWP NDCs can reimburse more."
+    },
+    {
+      "id": "partd-awp",
+      "name": "Medicare Part D plan (sample AWP-80% + fee)",
+      "formula": "awp_discount_plus_fee",
+      "awp_discount": 0.8,
+      "dispensing_fee": 0.75,
+      "notes": "Pure AWP-discount pricing; NDC-specific AWP drives reimbursement."
+    }
+  ]
+}

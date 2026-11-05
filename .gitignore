@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.pytest_cache/
+.tmp-home/
+real_data/
+*.egg-info/
+.claude/settings.local.json

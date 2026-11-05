@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ndc-scout": {
+      "command": "python",
+      "args": ["-m", "ndc_scout.mcp_server"],
+      "env": {}
+    }
+  }
+}

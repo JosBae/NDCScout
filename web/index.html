@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NDC Scout</title>
+<script type="importmap">
+  { "imports": { "@material/web/": "https://esm.run/@material/web@2.3.0/" } }
+</script>
+<script type="module">
+  import '@material/web/all.js';
+</script>
+<style>
+/* ---------- Material Design 3 color roles (hand-tuned, brand = teal-green) ---------- */
+:root{
+  color-scheme:light;
+  --md-sys-color-primary:#0b6e4f; --md-sys-color-on-primary:#ffffff;
+  --md-sys-color-primary-container:#b7f1d4; --md-sys-color-on-primary-container:#00210f;
+  --md-sys-color-secondary:#4b6358; --md-sys-color-on-secondary:#ffffff;
+  --md-sys-color-secondary-container:#cde9d9; --md-sys-color-on-secondary-container:#072016;
+  --md-sys-color-tertiary:#3d6373; --md-sys-color-on-tertiary:#ffffff;
+  --md-sys-color-tertiary-container:#c0e8fb; --md-sys-color-on-tertiary-container:#001f29;
+  --md-sys-color-error:#ba1a1a; --md-sys-color-on-error:#ffffff;
+  --md-sys-color-error-container:#ffdad6; --md-sys-color-on-error-container:#410002;
+  --md-sys-color-surface:#fcfcfb; --md-sys-color-on-surface:#0b0b0b;
+  --md-sys-color-surface-variant:#dde5df; --md-sys-color-on-surface-variant:#414944;
+  --md-sys-color-surface-container-lowest:#ffffff; --md-sys-color-surface-container-low:#f6f6f3;
+  --md-sys-color-surface-container:#f0f0ed; --md-sys-color-surface-container-high:#eaeae6;
+  --md-sys-color-surface-container-highest:#e4e4e0;
+  --md-sys-color-outline:#70796f; --md-sys-color-outline-variant:#c0c9c1;
+  --md-sys-color-background:#f9f9f7; --md-sys-color-on-background:#0b0b0b;
+  --md-ref-typeface-plain:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --md-ref-typeface-brand:system-ui,-apple-system,"Segoe UI",sans-serif;
+  /* dataviz chart tokens (light) */
+  --viz-surface:#fcfcfb; --viz-text:#0b0b0b; --viz-text-secondary:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-baseline:#c3c2b7;
+  --viz-series-mac:#2a78d6; --viz-series-awp:#eb6834;
+}
+@media (prefers-color-scheme:dark){:root{
+  color-scheme:dark;
+  --md-sys-color-primary:#3fbf8f; --md-sys-color-on-primary:#00391f;
+  --md-sys-color-primary-container:#00522f; --md-sys-color-on-primary-container:#b7f1d4;
+  --md-sys-color-secondary:#b2ccbe; --md-sys-color-on-secondary:#1e352a;
+  --md-sys-color-secondary-container:#344b40; --md-sys-color-on-secondary-container:#cde9d9;
+  --md-sys-color-tertiary:#a2cce0; --md-sys-color-on-tertiary:#023545;
+  --md-sys-color-tertiary-container:#214c5c; --md-sys-color-on-tertiary-container:#c0e8fb;
+  --md-sys-color-error:#ffb4ab; --md-sys-color-on-error:#690005;
+  --md-sys-color-error-container:#93000a; --md-sys-color-on-error-container:#ffdad6;
+  --md-sys-color-surface:#1a1a19; --md-sys-color-on-surface:#f0efec;
+  --md-sys-color-surface-variant:#414944; --md-sys-color-on-surface-variant:#c0c9c1;
+  --md-sys-color-surface-container-lowest:#0d0d0c; --md-sys-color-surface-container-low:#1d1d1c;
+  --md-sys-color-surface-container:#212120; --md-sys-color-surface-container-high:#2b2b2a;
+  --md-sys-color-surface-container-highest:#363635;
+  --md-sys-color-outline:#8a938b; --md-sys-color-outline-variant:#414944;
+  --md-sys-color-background:#0d0d0d; --md-sys-color-on-background:#f0efec;
+  --viz-surface:#1a1a19; --viz-text:#f0efec; --viz-text-secondary:#c3c2b7; --viz-muted:#898781;
+  --viz-grid:#2c2c2a; --viz-baseline:#383835;
+  --viz-series-mac:#3987e5; --viz-series-awp:#d95926;
+}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--md-sys-color-background);color:var(--md-sys-color-on-background);
+  font:15px/1.5 var(--md-ref-typeface-plain)}
+header{padding:28px 24px 4px;max-width:1180px;margin:auto}
+h1{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--md-sys-color-on-surface-variant);font-size:14.5px}
+.banner{max-width:1180px;margin:14px auto 0;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:12px;font-weight:500;padding:4px 10px;border-radius:8px;background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)}
+.badge.warn{background:#fdebc8;color:#5c3f00}
+.badge.ok{background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)}
+@media (prefers-color-scheme:dark){.badge.warn{background:#4a3a12;color:#ffdfa6}}
+nav.tabs{max-width:1180px;margin:18px auto 0;padding:0 24px;display:flex;gap:4px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
+nav.tabs button{font:inherit;font-weight:600;font-size:13.5px;background:none;border:0;cursor:pointer;
+  color:var(--md-sys-color-on-surface-variant);padding:12px 6px;margin-right:22px;position:relative;letter-spacing:.01em}
+nav.tabs button.on{color:var(--md-sys-color-primary)}
+nav.tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--md-sys-color-primary);border-radius:2px 2px 0 0}
+@media (max-width:860px){nav.tabs{padding:0 16px}}
+
+.page{max-width:1180px;margin:auto;padding:18px 24px 56px}
+.page[hidden]{display:none}
+main{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start;padding:0}
+main>*{min-width:0}
+@media (max-width:860px){.page{padding:14px 16px 44px}main{grid-template-columns:minmax(0,1fr)}header,.banner{padding-left:16px;padding-right:16px}}
+
+/* ---------- page transitions ---------- */
+::view-transition-old(root){animation:page-out .16s ease-out both}
+::view-transition-new(root){animation:page-in .18s ease-out both}
+@keyframes page-out{to{opacity:0;transform:translateY(-6px)}}
+@keyframes page-in{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
+
+.panel{background:var(--md-sys-color-surface-container-low);border:1px solid var(--md-sys-color-outline-variant);
+  border-radius:16px;padding:18px}
+.panel.flat{background:var(--md-sys-color-surface-container-lowest)}
+.field-label{display:block;font-size:12px;font-weight:600;color:var(--md-sys-color-on-surface-variant);
+  margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+.field-label:first-child{margin-top:0}
+input.plain{width:100%;padding:12px 14px;border:1px solid var(--md-sys-color-outline);border-radius:4px;
+  background:transparent;color:var(--md-sys-color-on-surface);font:inherit}
+input.plain:focus{outline:2px solid var(--md-sys-color-primary);outline-offset:-1px}
+md-outlined-text-field,md-outlined-select{width:100%;display:block}
+.hint{font-size:12.5px;color:var(--md-sys-color-on-surface-variant);margin-top:6px;line-height:1.45}
+.seg{display:flex;gap:8px}.seg>*{flex:1}
+.mix{display:grid;grid-template-columns:1fr 64px;gap:8px;align-items:center;font-size:13px;margin-top:4px}
+.mix input{padding:6px 7px;border:1px solid var(--md-sys-color-outline-variant);border-radius:4px;
+  background:transparent;color:var(--md-sys-color-on-surface);font:inherit;text-align:right}
+.switch-row{display:flex;gap:10px;align-items:center;margin-top:16px}
+.switch-row span{font-size:13.5px;color:var(--md-sys-color-on-surface)}
+.actions{display:grid;gap:10px;margin-top:20px}
+
+.reco{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}
+.reco .lbl{font-size:12px;color:var(--md-sys-color-on-surface-variant);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.reco .big{font:600 28px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.reco .money{font-size:28px;font-weight:700;color:var(--md-sys-color-primary)}
+.summary{margin:14px 0 0;color:var(--md-sys-color-on-surface);line-height:1.55}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--md-sys-color-outline-variant);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--md-sys-color-on-surface-variant);font-weight:600}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.ndc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+tr.best td{background:var(--md-sys-color-primary-container)}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin:1px 3px 1px 0;
+  background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)}
+.tag.blocking{background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container)}
+.tag.warning{background:#fdebc8;color:#5c3f00}
+@media (prefers-color-scheme:dark){.tag.warning{background:#4a3a12;color:#ffdfa6}}
+.tablewrap{overflow-x:auto}
+section+section{margin-top:22px;padding-top:22px;border-top:1px solid var(--md-sys-color-outline-variant)}
+section:first-child{margin-top:0;padding-top:0;border-top:0}
+h2{font-size:13px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.06em;color:var(--md-sys-color-on-surface-variant);
+  font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+ul.needs{margin:0;padding-left:20px}ul.needs li{margin:5px 0}
+.err{color:var(--md-sys-color-error)}
+.empty{color:var(--md-sys-color-on-surface-variant);text-align:center;padding:48px 16px}
+
+/* ---------- agent trace (turn-by-turn log) ---------- */
+.trace{display:flex;flex-direction:column;gap:10px}
+.turn{border:1px solid var(--md-sys-color-outline-variant);border-radius:10px;overflow:hidden}
+.turn>summary{list-style:none;cursor:pointer;padding:9px 13px;font-size:12.5px;font-weight:600;
+  color:var(--md-sys-color-on-surface-variant);background:var(--md-sys-color-surface-container);
+  display:flex;gap:8px;align-items:center}
+.turn>summary::-webkit-details-marker{display:none}
+.turn>summary::before{content:"▸";display:inline-block;transition:transform .12s;color:var(--md-sys-color-outline)}
+.turn[open]>summary::before{transform:rotate(90deg)}
+.turn-body{padding:11px 13px 13px;display:flex;flex-direction:column;gap:9px}
+.tc{display:flex;gap:9px;align-items:flex-start;font-size:13px}
+.tc .dot2{width:7px;height:7px;border-radius:50%;background:var(--md-sys-color-primary);margin-top:6px;flex:none}
+.tc-name{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600}
+.tc-sub{color:var(--md-sys-color-on-surface-variant);font-size:12.5px;margin-top:2px}
+.tc details{margin-top:4px}
+.tc details summary{cursor:pointer;font-size:12px;color:var(--md-sys-color-primary)}
+.tc pre{margin:6px 0 0;padding:8px 10px;background:var(--md-sys-color-surface-container-highest);border-radius:6px;
+  font-size:11.5px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.answer-line{font-size:13px;color:var(--md-sys-color-on-surface);display:flex;gap:9px;align-items:flex-start}
+.verdict{display:flex;gap:10px;align-items:flex-start;padding:10px 13px;border-radius:10px;font-size:13px}
+.verdict.pass{background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)}
+.verdict.fail{background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container)}
+.verdict .ico{font-weight:700}
+.verdict ul{margin:6px 0 0;padding-left:18px}
+
+/* ---------- dumbbell comparison chart ---------- */
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:4px}
+.legend-item{display:flex;gap:7px;align-items:center;font-size:13px;color:var(--viz-text)}
+.legend-item .key{width:14px;height:3px;border-radius:2px}
+.cmp-row{position:relative}
+.cmp-svg{width:100%;height:auto;display:block;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+.cmp-svg .rowlabel{font:12.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--viz-text)}
+.cmp-svg .rowsub{font:11px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--viz-muted)}
+.cmp-svg .axislabel{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;fill:var(--viz-muted)}
+.cmp-svg .dot{cursor:pointer}
+.cmp-svg .dot:focus{outline:2px solid var(--md-sys-color-primary);outline-offset:1px}
+.cmp-svg .delta{font:600 12px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--viz-text-secondary)}
+.cmp-tooltip{position:absolute;pointer-events:none;background:var(--md-sys-color-surface-container-highest);
+  color:var(--md-sys-color-on-surface);border:1px solid var(--md-sys-color-outline-variant);border-radius:8px;
+  padding:8px 10px;font-size:12.5px;line-height:1.5;box-shadow:0 2px 10px rgba(0,0,0,.18);opacity:0;
+  transition:opacity .08s;z-index:5;max-width:240px}
+.cmp-tooltip b{font-variant-numeric:tabular-nums}
+.cmp-toolbar{display:flex;justify-content:flex-end;margin:-4px 0 10px}
+
+.model-note{background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container);
+  border-radius:10px;padding:11px 14px;font-size:13px;line-height:1.55;margin:12px 0 0}
+.model-note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+  background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px}
+@media (prefers-color-scheme:dark){.model-note code{background:rgba(255,255,255,.14)}}
+
+/* ---------- rate audit page ---------- */
+.audit-form{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.audit-form md-outlined-select{width:320px}
+.audit-group+.audit-group{margin-top:20px}
+.audit-group h3{font-size:12px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--md-sys-color-on-surface-variant);font-weight:700}
+.check-row{display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border-radius:10px;font-size:13.5px;margin-bottom:6px}
+.check-row.warning{background:#fdebc8;color:#5c3f00}
+@media (prefers-color-scheme:dark){.check-row.warning{background:#3a2d0c;color:#ffdfa6}}
+.check-row.info{background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)}
+.check-row .ico{font-weight:700;flex:none}
+.check-row .nums{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;margin-top:3px;opacity:.85}
+.audit-clean{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:10px;
+  background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container);font-size:13.5px}
+</style>
+</head>
+<body>
+<header><h1>NDC Scout</h1><p>Which NDC of this generic actually reimburses best for my pharmacy?</p></header>
+<div class="banner" id="banner"></div>
+<nav class="tabs" id="pageNav">
+  <button type="button" data-page="rank">Ranking</button>
+  <button type="button" data-page="audit">Rate audit</button>
+</nav>
+
+<div class="page" id="page-rank">
+<main>
+  <div class="panel" id="form">
+    <label class="field-label" for="drug">Drug</label>
+    <input class="plain" id="drug" list="druglist" value="atorvastatin 40 mg" autocomplete="off">
+    <datalist id="druglist"></datalist>
+
+    <label class="field-label" for="qty">Quantity per fill</label>
+    <md-outlined-text-field id="qty" type="number" min="0.1" step="any" value="30"></md-outlined-text-field>
+
+    <label class="field-label">Payer</label>
+    <div class="seg" id="payerMode">
+      <md-filled-button data-v="one">One payer</md-filled-button>
+      <md-outlined-button data-v="mix">Payer mix</md-outlined-button>
+    </div>
+    <div id="onePayer" style="margin-top:10px"><md-outlined-select id="payer"></md-outlined-select></div>
+    <div id="mixPayer" class="mix" style="margin-top:10px;display:none"></div>
+    <div class="hint" id="payerNote"></div>
+
+    <label class="field-label">Model</label>
+    <div class="seg" id="modelMode">
+      <md-filled-button data-v="mock">Mock</md-filled-button>
+      <md-outlined-button data-v="live">Meta (live)</md-outlined-button>
+    </div>
+    <div class="hint" id="modeNote"></div>
+
+    <div class="switch-row">
+      <md-switch id="mistake"></md-switch>
+      <span>Mock answers wrong first (demo the verifier)</span>
+    </div>
+
+    <div class="actions">
+      <md-filled-button id="ask">Ask the agent</md-filled-button>
+      <md-outlined-button id="rank">Rank only (no model, free)</md-outlined-button>
+      <md-outlined-button id="compare">Compare AWP vs MAC</md-outlined-button>
+    </div>
+  </div>
+  <div id="out"><div class="panel flat empty">Pick a drug and payer, then ask the agent, rank instantly, or compare AWP vs MAC reimbursement.</div></div>
+</main>
+</div>
+
+<div class="page" id="page-audit" hidden>
+  <div class="panel">
+    <h2 style="margin-bottom:14px">Audit a payer's MAC rates</h2>
+    <p class="hint" style="margin:0 0 16px">Cross-checks one payer's contracted MAC against every other MAC-based payer for the same drug, and against the public NADAC rate — a quick way to spot a rate that looks stingier than it should, a possible sign of a payer underpaying independents relative to peers.</p>
+    <div class="audit-form">
+      <md-outlined-select id="auditPayer" style="flex:1;max-width:360px"></md-outlined-select>
+      <md-filled-button id="auditRun">Run audit</md-filled-button>
+    </div>
+  </div>
+  <div id="auditOut" style="margin-top:18px"></div>
+</div>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = v => v == null ? "—" : "$" + Number(v).toFixed(2);
+const signedMoney = v => (v == null ? "—" : (v >= 0 ? "+$" + v.toFixed(2) : "-$" + Math.abs(v).toFixed(2)));
+let health = null, payers = [], payerMode = "one", modelMode = "mock";
+
+async function api(path, body) {
+  const r = await fetch(path, body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail || j));
+  return j;
+}
+function seg(containerId, cb) {
+  const container = $(containerId);
+  const apply = v => {
+    container.querySelectorAll("[data-v]").forEach(btn => swapKind(btn, btn.dataset.v === v));
+    cb(v);
+  };
+  container.addEventListener("click", e => {
+    const b = e.target.closest("[data-v]");
+    if (b) apply(b.dataset.v);
+  });
+  return apply;
+}
+function swapKind(btn, filled) {
+  const want = filled ? "md-filled-button" : "md-outlined-button";
+  if (btn.tagName.toLowerCase() === want) return;
+  const next = document.createElement(want);
+  next.dataset.v = btn.dataset.v; next.textContent = btn.textContent;
+  btn.replaceWith(next);
+}
+function setModel(v) {
+  modelMode = v;
+  $("#modeNote").textContent = v === "mock"
+    ? "Scripted stand-in for Meta Model API (not a model). Free, offline, same HTTP + tool-calling path."
+    : (health?.meta_api?.key_configured ? `Calls ${health.meta_api.model} at ${health.meta_api.base_url}. Budget $${health.meta_api.max_run_usd}/run.`
+       : "No META_API_KEY on the server. Live calls will fail with a fix-it message.");
+  $(".switch-row").style.display = v === "mock" ? "flex" : "none";
+}
+async function init() {
+  health = await api("/api/health");
+  const b = [];
+  if (health.synthetic_data) b.push('<span class="badge warn">SYNTHETIC SAMPLE DATA: invented prices, fictitious labelers</span>');
+  b.push(`<span class="badge">${health.ndc_count} NDCs · ${health.payer_count} payers · as of ${health.data_as_of}</span>`);
+  b.push(health.meta_api.key_configured ? `<span class="badge ok">Meta key configured · ${esc(health.meta_api.model)}</span>` : '<span class="badge">No Meta key: mock mode</span>');
+  $("#banner").innerHTML = b.join("");
+  const d = await api("/api/drugs");
+  $("#druglist").innerHTML = d.drugs.map(x => `<option value="${esc(x.generic_name + " " + x.strength)}">${esc(x.drug_id)}</option>`).join("");
+  payers = (await api("/api/payers")).payers;
+  $("#payer").innerHTML = payers.map(p => `<md-select-option value="${esc(p.id)}"><div slot="headline">${esc(p.name)}</div></md-select-option>`).join("");
+  $("#payer").value = payers[0]?.id || "";
+  const macPayers = payers.filter(p => p.formula === "mac_plus_fee" || p.formula === "lesser_of_awp_discount_or_mac");
+  $("#auditPayer").innerHTML = macPayers.map(p => `<md-select-option value="${esc(p.id)}"><div slot="headline">${esc(p.name)}</div></md-select-option>`).join("");
+  $("#auditPayer").value = macPayers[0]?.id || "";
+  $("#mixPayer").innerHTML = payers.map((p, i) => `<span>${esc(p.name)}</span><input type="number" min="0" step="5" data-p="${esc(p.id)}" value="${[30,40,10,20][i] ?? 0}">`).join("");
+  const note = () => { const p = payers.find(x => x.id === $("#payer").value); $("#payerNote").textContent = payerMode === "one" ? (p?.notes || "") : "Weights = % of fills for this drug, by plan."; };
+  $("#payer").addEventListener("change", note); note();
+  const applyPayerMode = seg("#payerMode", v => { payerMode = v; $("#onePayer").style.display = v === "one" ? "" : "none"; $("#mixPayer").style.display = v === "mix" ? "grid" : "none"; note(); });
+  const applyModelMode = seg("#modelMode", setModel);
+  applyPayerMode("one");
+  applyModelMode(health.meta_api.key_configured ? "live" : "mock");
+  $("#drug").addEventListener("change", updateUnit); updateUnit();
+  $("#ask").addEventListener("click", () => run("ask"));
+  $("#rank").addEventListener("click", () => run("rank"));
+  $("#compare").addEventListener("click", () => run("compare"));
+  $("#pageNav").addEventListener("click", e => {
+    const b = e.target.closest("[data-page]");
+    if (b) showPage(b.dataset.page);
+  });
+  $("#auditRun").addEventListener("click", runAudit);
+  showPage("rank");
+}
+function showPage(name) {
+  withTransition(() => {
+    $("#pageNav").querySelectorAll("[data-page]").forEach(b => b.classList.toggle("on", b.dataset.page === name));
+    $("#page-rank").hidden = name !== "rank";
+    $("#page-audit").hidden = name !== "audit";
+  });
+}
+function withTransition(fn) {
+  if (document.startViewTransition) document.startViewTransition(fn);
+  else fn();
+}
+async function updateUnit() {
+  const d = await api("/api/drugs?q=" + encodeURIComponent($("#drug").value)).catch(() => ({drugs: []}));
+  $("#qty").setAttribute("supporting-text", d.drugs[0] ? `billed in ${d.drugs[0].billing_unit}` : "");
+}
+function payerArgs() {
+  if (payerMode === "one") return {payer_id: $("#payer").value};
+  const mix = {}; $("#mixPayer").querySelectorAll("input").forEach(i => { const v = +i.value; if (v > 0) mix[i.dataset.p] = v; });
+  return {payer_mix: mix};
+}
+async function resolveDrugId() {
+  const m = await api("/api/drugs?q=" + encodeURIComponent($("#drug").value));
+  if (!m.drugs.length) throw new Error("No drug matches that text.");
+  return m.drugs[0].drug_id;
+}
+async function run(kind) {
+  const btn = {ask: $("#ask"), rank: $("#rank"), compare: $("#compare")}[kind];
+  const others = ["ask", "rank", "compare"].filter(k => k !== kind).map(k => ({ask: $("#ask"), rank: $("#rank"), compare: $("#compare")}[k]));
+  btn.disabled = true; others.forEach(o => o.disabled = true);
+  const label = btn.textContent;
+  btn.innerHTML = `<md-circular-progress indeterminate style="--md-circular-progress-size:16px;margin-right:6px;vertical-align:-3px"></md-circular-progress>${kind === "ask" ? "Agent working…" : kind === "rank" ? "Ranking…" : "Comparing…"}`;
+  try {
+    const qty = +$("#qty").value;
+    if (kind === "ask") {
+      const r = await api("/api/ask", {drug: $("#drug").value, quantity: qty, mode: modelMode, mock_mistake: $("#mistake").selected, ...payerArgs()});
+      const truth = r.report?.drug_id ? await api("/api/rank", {drug_id: r.report.drug_id, quantity: qty, ...payerArgs()}).catch(() => null) : null;
+      renderAgent(r, truth);
+    } else if (kind === "rank") {
+      const drugId = await resolveDrugId();
+      renderRank(await api("/api/rank", {drug_id: drugId, quantity: qty, ...payerArgs()}));
+    } else {
+      await renderCompare(await resolveDrugId(), qty);
+    }
+  } catch (e) { withTransition(() => $("#out").innerHTML = `<div class="panel flat err">${esc(e.message)}</div>`); }
+  finally { btn.disabled = false; btn.textContent = label; others.forEach(o => o.disabled = false); }
+}
+async function runAudit() {
+  const btn = $("#auditRun"); btn.disabled = true; const label = btn.textContent;
+  btn.innerHTML = `<md-circular-progress indeterminate style="--md-circular-progress-size:16px;margin-right:6px;vertical-align:-3px"></md-circular-progress>Auditing…`;
+  try {
+    const payerId = $("#auditPayer").value;
+    if (!payerId) throw new Error("This dataset has no MAC-based payer to audit.");
+    renderAudit(await api("/api/rate-audit?payer_id=" + encodeURIComponent(payerId)));
+  } catch (e) { withTransition(() => $("#auditOut").innerHTML = `<div class="panel flat err">${esc(e.message)}</div>`); }
+  finally { btn.disabled = false; btn.textContent = label; }
+}
+function renderAudit(r) {
+  const groups = {warning: [], info: []};
+  r.checks.forEach(c => (groups[c.severity] || groups.info).push(c));
+  const icon = {mac_below_peer_payers: "⚖", mac_below_nadac_floor: "▽", no_mac_on_file: "·"};
+  const checkRow = c => `<div class="check-row ${c.severity}"><span class="ico">${icon[c.code] || "•"}</span>
+    <div><div>${esc(c.message)}</div>
+    ${c.code === "mac_below_peer_payers" ? `<div class="nums">this payer ${c.this_mac}/unit · ${esc(c.peer_payer_name)} ${c.peer_mac}/unit · ${(c.ratio * 100).toFixed(0)}% of peer</div>` : ""}
+    ${c.code === "mac_below_nadac_floor" ? `<div class="nums">this payer ${c.this_mac}/unit · NADAC floor ${c.nadac_floor}/unit</div>` : ""}
+    </div></div>`;
+  const body = !r.uses_mac
+    ? `<div class="audit-clean"><span class="ico">ℹ</span> ${esc(r.payer.name)} doesn't use a MAC (formula: ${esc(r.payer.formula)}), so there's no MAC table to audit.</div>`
+    : (r.checks.length === 0
+      ? `<div class="audit-clean"><span class="ico">✓</span> No issues found across ${r.summary.drugs_on_file} drug(s) on file for ${esc(r.payer.name)}.</div>`
+      : `${groups.warning.length ? `<div class="audit-group"><h3>Worth reviewing (${groups.warning.length})</h3>${groups.warning.map(checkRow).join("")}</div>` : ""}
+         ${groups.info.length ? `<div class="audit-group"><h3>Coverage gaps (${groups.info.length})</h3>${groups.info.map(checkRow).join("")}</div>` : ""}`);
+  withTransition(() => { $("#auditOut").innerHTML = `<div class="panel">
+    <h2>${esc(r.payer.name)} <span class="badge">${r.summary.drugs_on_file} drugs on file</span>${r.summary.flagged ? ` <span class="badge warn">${r.summary.flagged} flagged</span>` : ""}</h2>
+    ${body}</div>`; });
+}
+function flagTags(c) {
+  if (c.blocked_by) return Object.entries(c.blocked_by).map(([p, codes]) => `<span class="tag blocking">${esc(codes.join(","))} @ ${esc(p)}</span>`).join("");
+  return (c.flags || []).map(f => typeof f === "string" ? `<span class="tag">${esc(f)}</span>` : `<span class="tag ${f.severity}" title="${esc(f.message)}">${esc(f.code)}</span>`).join("");
+}
+function rankTable(r) {
+  const mix = !!r.payer_mix, key = mix ? "expected_margin" : "margin";
+  const rows = r.candidates.map(c => `<tr class="${c.ndc === r.best_ndc ? "best" : ""}"><td class="ndc">${esc(c.ndc)}</td><td>${esc(c.labeler)}</td><td>${esc(c.package)}</td>
+    ${mix ? "" : `<td class="num">${money(c.reimbursement)}</td><td class="num">${money(c.acquisition_cost)}</td>`}
+    <td class="num"><b>${money(c[key])}</b></td>${mix ? "" : `<td>${esc(c.confidence)}</td>`}<td>${flagTags(c)}</td></tr>`).join("");
+  return `<div class="tablewrap"><table><thead><tr><th>NDC</th><th>Labeler</th><th>Package</th>${mix ? "" : "<th class=num>Reimb.</th><th class=num>Acq. cost</th>"}
+    <th class="num">${mix ? "Exp. margin" : "Margin"}</th>${mix ? "" : "<th>Conf.</th>"}<th>Flags</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderRank(r) {
+  withTransition(() => { $("#out").innerHTML = `<div class="panel"><section><h2>Engine ranking · ${esc(r.drug.generic_name)} ${esc(r.drug.strength)} · ${r.quantity} ${esc(r.drug.billing_unit)}</h2>
+    <div class="reco"><div><div class="lbl">Best NDC</div><div class="big">${esc(r.best_ndc || "none")}</div></div>
+    ${r.margin_spread_per_fill != null ? `<div><div class="lbl">Best vs worst per fill</div><div class="money">${money(r.margin_spread_per_fill)}</div></div>` : ""}</div></section>
+    <section>${rankTable(r)}</section></div>`; });
+}
+function argsLine(argsStr) {
+  try {
+    const o = JSON.parse(argsStr || "{}");
+    const parts = Object.entries(o).map(([k, v]) => `${k}: ${typeof v === "object" ? JSON.stringify(v) : v}`);
+    return parts.length ? esc(parts.join(", ")) : "no arguments";
+  } catch { return esc(argsStr || ""); }
+}
+function prettyJson(s) {
+  try { return JSON.stringify(JSON.parse(String(s).replace(/…$/, "")), null, 2); } catch { return String(s ?? ""); }
+}
+function groupTrace(trace) {
+  const turns = new Map(), banners = [];
+  trace.forEach(t => {
+    if (t.type === "model" || t.type === "tool" || t.type === "verification") {
+      if (!turns.has(t.turn)) turns.set(t.turn, {model: null, tools: [], verification: null});
+      const g = turns.get(t.turn);
+      if (t.type === "model") g.model = t;
+      else if (t.type === "tool") g.tools.push(t);
+      else g.verification = t;
+    } else banners.push(t);
+  });
+  return {turns: [...turns.entries()].sort((a, b) => a[0] - b[0]), banners};
+}
+function renderTurn(n, g, isLast) {
+  const toolCount = g.tools.length;
+  const summaryText = g.verification
+    ? (g.verification.passed ? "final answer · verified against the engine" : "final answer · verification failed")
+    : (toolCount ? `called ${toolCount} tool${toolCount > 1 ? "s" : ""}` : "thinking…");
+  const toolRows = g.tools.map(t => `<div class="tc"><span class="dot2"></span><div style="flex:1">
+      <div class="tc-name">${esc(t.name)}</div>
+      <div class="tc-sub">${argsLine(t.arguments)}</div>
+      <details><summary>View result</summary><pre>${esc(prettyJson(t.result_preview))}</pre></details>
+    </div></div>`).join("");
+  const answer = (!toolCount && g.model) ? `<div class="answer-line"><span class="dot2" style="background:var(--md-sys-color-on-surface-variant)"></span>
+      <div>${esc(g.model.text || "(empty response)")}</div></div>` : "";
+  const verdict = g.verification ? `<div class="verdict ${g.verification.passed ? "pass" : "fail"}">
+      <span class="ico">${g.verification.passed ? "✓" : "✗"}</span>
+      <div>${g.verification.passed ? "Every number the model reported matches the engine's own calculation."
+        : `The engine recomputed the answer and found a mismatch:<ul>${(g.verification.errors || []).map(e => `<li>${esc(e)}</li>`).join("")}</ul>`}</div></div>` : "";
+  return `<details class="turn" ${isLast ? "open" : ""}><summary>Turn ${n} · ${esc(summaryText)}</summary>
+    <div class="turn-body">${toolRows}${answer}${verdict}</div></details>`;
+}
+function renderBanner(t) {
+  return `<div class="verdict fail"><span class="ico">⚠</span><div>${esc(t.message || t.reason || t.type)}
+    ${t.fix ? `<div class="tc-sub" style="margin-top:4px">${esc(t.fix)}</div>` : ""}</div></div>`;
+}
+function modelExplainer(r) {
+  const toolCalls = r.trace.filter(t => t.type === "tool").length;
+  const re = health?.meta_api?.reasoning_effort;
+  const where = r.mode === "mock"
+    ? "a scripted stand-in server (same HTTP + OpenAI-compatible tool-calling protocol as the real Meta Model API, used here so demo runs are free and offline)"
+    : `Meta's own API at <code>${esc(health?.meta_api?.base_url || "")}</code>`;
+  return `<div class="model-note"><b>${esc(r.model)}</b> via ${where}. It was handed a fixed set of tools (drug search, NDC ranking, per-NDC pricing,
+    payer-rate auditing) through OpenAI-compatible function calling${re ? `, with <code>reasoning_effort=${esc(re)}</code>,` : ","} made
+    <b>${toolCalls}</b> tool call${toolCalls === 1 ? "" : "s"} across <b>${r.usage.calls}</b> model turn${r.usage.calls === 1 ? "" : "s"}, and had
+    to return one JSON object as its final answer — it never computed a dollar figure itself; every number below is independently recomputed and checked.</div>`;
+}
+function renderAgent(r, truth) {
+  const rep = r.report || {};
+  const statusTone = {verified: "ok", unverified: "warn", api_error: "warn", budget_exceeded: "warn", max_turns: "warn"}[r.status] || "";
+  const {turns, banners} = groupTrace(r.trace);
+  const lastTurn = turns.length ? Math.max(...turns.map(([n]) => n)) : null;
+  const steps = turns.map(([n, g]) => renderTurn(n, g, n === lastTurn)).join("") + banners.map(renderBanner).join("");
+  withTransition(() => { $("#out").innerHTML = `<div class="panel">
+    <section><h2>Agent answer <span class="badge ${statusTone}">${esc(r.status)}</span>
+      <span class="badge">${r.usage.calls} calls · ${r.usage.input_tokens}/${r.usage.output_tokens} tok · ~$${(r.usage.cost_usd || 0).toFixed(4)}</span></h2>
+      ${modelExplainer(r)}
+      ${r.error ? `<p class="err">${esc(r.error.message)}<br>${esc(r.error.fix || "")}</p>` : ""}
+      ${rep.recommended_ndc !== undefined ? `<div class="reco"><div><div class="lbl">Recommended NDC</div><div class="big">${esc(rep.recommended_ndc || "none")}</div></div>
+      <div><div class="lbl">Margin per fill</div><div class="money">${money(rep.expected_margin_per_fill)}</div></div></div>` : ""}
+      ${(rep.summary || rep.needs_human?.length) ? `<details class="turn" open style="margin-top:14px">
+        <summary>Details${rep.needs_human?.length ? ` · ${rep.needs_human.length} flagged for a human` : ""}</summary>
+        <div class="turn-body">
+          ${rep.summary ? `<p class="summary" style="margin:0">${esc(rep.summary)}</p>` : ""}
+          ${rep.needs_human?.length ? `<ul class="needs" style="margin:0">${rep.needs_human.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+        </div>
+      </details>` : ""}</section>
+    ${truth ? `<section><h2>Engine numbers (what the verifier checked against)</h2>${rankTable(truth)}</section>` : ""}
+    <section><h2>Trace</h2><div class="trace">${steps}</div></section></div>`; });
+}
+
+/* ---------- AWP vs MAC comparison (dumbbell chart) ---------- */
+function niceStep(range, targetTicks) {
+  if (range <= 0) return 1;
+  const raw = range / targetTicks, mag = Math.pow(10, Math.floor(Math.log10(raw))), norm = raw / mag;
+  return (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+}
+async function renderCompare(drugId, qty) {
+  const macPayer = payers.find(p => p.formula === "mac_plus_fee");
+  const awpPayer = payers.find(p => p.formula === "awp_discount_plus_fee");
+  if (!macPayer || !awpPayer) {
+    $("#out").innerHTML = `<div class="panel flat empty">This dataset doesn't define both a pure MAC payer and a pure AWP-discount payer, so there's nothing to compare. Check <code>payers.json</code>.</div>`;
+    return;
+  }
+  const [macRank, awpRank] = await Promise.all([
+    api("/api/rank", {drug_id: drugId, quantity: qty, payer_id: macPayer.id}),
+    api("/api/rank", {drug_id: drugId, quantity: qty, payer_id: awpPayer.id}),
+  ]);
+  const macByNdc = Object.fromEntries(macRank.candidates.map(c => [c.ndc11, c]));
+  const rows = awpRank.candidates.map(awp => {
+    const mac = macByNdc[awp.ndc11];
+    const awpM = awp.computable ? awp.margin : null, macM = mac?.computable ? mac.margin : null;
+    return {ndc: awp.ndc, labeler: awp.labeler, package: awp.package, awp, mac, awpM, macM,
+             delta: (awpM != null && macM != null) ? awpM - macM : null};
+  }).sort((a, b) => (b.delta ?? -Infinity) - (a.delta ?? -Infinity));
+
+  const W = 760, rowH = 40, padTop = 10, padBottom = 32, labelW = 230, chartRight = 40;
+  const H = padTop + rows.length * rowH + padBottom;
+  const plotX0 = labelW, plotX1 = W - chartRight;
+  const vals = rows.flatMap(r => [r.awpM, r.macM]).filter(v => v != null);
+  const dataMin = Math.min(0, ...vals), dataMax = Math.max(0, ...vals);
+  const step = niceStep(dataMax - dataMin || 1, 4);
+  const niceMin = Math.floor(dataMin / step) * step, niceMax = Math.ceil(dataMax / step) * step;
+  const x = v => plotX0 + ((v - niceMin) / (niceMax - niceMin || 1)) * (plotX1 - plotX0);
+  const ticks = []; for (let t = niceMin; t <= niceMax + 1e-9; t += step) ticks.push(t);
+
+  const gridlines = ticks.map(t => `<line x1="${x(t)}" y1="${padTop - 4}" x2="${x(t)}" y2="${H - padBottom + 4}" stroke="var(--viz-grid)" stroke-width="1"/>
+    <text class="axislabel" x="${x(t)}" y="${H - padBottom + 18}" text-anchor="middle">${money(t)}</text>`).join("");
+  const baselineX = x(0);
+  const baseline = niceMin < 0 ? `<line x1="${baselineX}" y1="${padTop - 4}" x2="${baselineX}" y2="${H - padBottom + 4}" stroke="var(--viz-baseline)" stroke-width="1.5"/>` : "";
+
+  const body = rows.map((r, i) => {
+    const cy = padTop + i * rowH + rowH / 2;
+    const hasAwp = r.awpM != null, hasMac = r.macM != null;
+    const line = hasAwp && hasMac ? `<line x1="${x(r.macM)}" y1="${cy}" x2="${x(r.awpM)}" y2="${cy}" stroke="var(--viz-baseline)" stroke-width="2"/>` : "";
+    const macDot = hasMac ? `<circle class="dot" tabindex="0" data-i="${i}" data-s="mac" cx="${x(r.macM)}" cy="${cy}" r="5" fill="var(--viz-series-mac)" stroke="var(--viz-surface)" stroke-width="2"/>` : "";
+    const awpDot = hasAwp ? `<circle class="dot" tabindex="0" data-i="${i}" data-s="awp" cx="${x(r.awpM)}" cy="${cy}" r="5" fill="var(--viz-series-awp)" stroke="var(--viz-surface)" stroke-width="2"/>` : "";
+    const rightmost = hasAwp && hasMac ? Math.max(x(r.awpM), x(r.macM)) : (hasAwp ? x(r.awpM) : (hasMac ? x(r.macM) : plotX0));
+    const deltaLabel = r.delta != null ? `<text class="delta" x="${Math.min(rightmost + 10, plotX1 - 4)}" y="${cy + 4}">${signedMoney(r.delta)}</text>` : "";
+    return `<g>
+      <text class="rowlabel" x="0" y="${cy - 3}">${esc(r.ndc)}</text>
+      <text class="rowsub" x="0" y="${cy + 12}">${esc(r.labeler)} · ${esc(r.package)}</text>
+      ${line}${macDot}${awpDot}${deltaLabel}
+    </g>`;
+  }).join("");
+
+  const macSwatch = "var(--viz-series-mac)", awpSwatch = "var(--viz-series-awp)";
+  const svg = `<svg class="cmp-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Margin per fill, MAC payer versus AWP payer, by NDC">
+    ${gridlines}${baseline}${body}
+  </svg>`;
+
+  withTransition(() => {
+    $("#out").innerHTML = `<div class="panel">
+    <section><h2>AWP vs MAC margin · ${esc(awpRank.drug.generic_name)} ${esc(awpRank.drug.strength)} · ${qty} ${esc(awpRank.drug.billing_unit)}</h2>
+      <p class="hint">Margin per fill for every NDC, under <b>${esc(macPayer.name)}</b> (MAC-based) versus <b>${esc(awpPayer.name)}</b> (AWP-discount-based). Same acquisition cost either way — the gap is purely the reimbursement formula.</p>
+      <div class="cmp-toolbar"><md-text-button id="cmpTableToggle">View as table</md-text-button></div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="key" style="background:${macSwatch}"></span>${esc(macPayer.name)} (MAC)</span>
+        <span class="legend-item"><span class="key" style="background:${awpSwatch}"></span>${esc(awpPayer.name)} (AWP)</span>
+      </div>
+      <div class="cmp-row" id="cmpChartWrap">${svg}<div class="cmp-tooltip" id="cmpTip"></div></div>
+      <div id="cmpTableWrap" style="display:none;margin-top:14px">${compareTable(rows)}</div>
+    </section>
+  </div>`;
+
+    const tip = $("#cmpTip"), wrap = $("#cmpChartWrap");
+    const showTip = (el) => {
+      const i = +el.dataset.i, r = rows[i];
+      tip.innerHTML = `<div><b>${esc(r.ndc)}</b> — ${esc(r.labeler)}</div>
+        <div style="margin-top:4px"><span style="color:${macSwatch}">●</span> MAC margin: <b>${money(r.macM)}</b></div>
+        <div><span style="color:${awpSwatch}">●</span> AWP margin: <b>${money(r.awpM)}</b></div>
+        ${r.delta != null ? `<div style="margin-top:4px">AWP − MAC: <b>${signedMoney(r.delta)}</b></div>` : ""}`;
+      const cx = +el.getAttribute("cx"), cy = +el.getAttribute("cy"), scale = wrap.clientWidth / W;
+      tip.style.left = Math.min(cx * scale + 14, wrap.clientWidth - 250) + "px";
+      tip.style.top = Math.max(cy * scale - 46, 0) + "px";
+      tip.style.opacity = "1";
+    };
+    wrap.querySelectorAll(".dot").forEach(el => {
+      el.addEventListener("pointerenter", () => showTip(el));
+      el.addEventListener("focus", () => showTip(el));
+      el.addEventListener("pointerleave", () => tip.style.opacity = "0");
+      el.addEventListener("blur", () => tip.style.opacity = "0");
+    });
+    $("#cmpTableToggle").addEventListener("click", () => {
+      const tableWrap = $("#cmpTableWrap"), showing = tableWrap.style.display !== "none";
+      tableWrap.style.display = showing ? "none" : "block";
+      $("#cmpTableToggle").textContent = showing ? "View as table" : "Hide table";
+    });
+  });
+}
+function compareTable(rows) {
+  const trs = rows.map(r => `<tr><td class="ndc">${esc(r.ndc)}</td><td>${esc(r.labeler)}</td><td>${esc(r.package)}</td>
+    <td class="num">${money(r.macM)}</td><td class="num">${money(r.awpM)}</td><td class="num"><b>${signedMoney(r.delta)}</b></td></tr>`).join("");
+  return `<div class="tablewrap"><table><thead><tr><th>NDC</th><th>Labeler</th><th>Package</th>
+    <th class="num">MAC margin</th><th class="num">AWP margin</th><th class="num">Δ (AWP − MAC)</th></tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+
+init().catch(e => $("#out").innerHTML = `<div class="panel flat err">Could not load: ${esc(e.message)}</div>`);
+</script>
+</body>
+</html>
